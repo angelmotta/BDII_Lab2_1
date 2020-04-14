@@ -14,7 +14,7 @@
 class SequentialFileRegistro {
 private:
     std::string filename;
-
+    int rowsDataFile;
     /**
      * Generate new DataFile
      */
@@ -32,6 +32,7 @@ private:
     // Custom Constructor
     SequentialFileRegistro(std::string _filename) {
         this->filename = _filename;
+        this->rowsDataFile = 0;
         initFiles();
     }
 
@@ -53,6 +54,7 @@ private:
             outFile << registro;    // Write object to file
             nextRecord++;
             row++;
+            rowsDataFile++;
         }
         outFile.close();
     }
@@ -74,6 +76,26 @@ private:
         }
         inFile.close();
      }
+
+     /**
+      * BinarySearch
+      */
+      void binarySearch(std::string key) {
+         std::cout << "\n** BinarySearch method **\n";
+         Registro record;
+         int sizeRecord = sizeof(record);
+         std::cout << "SizeRecord: " << sizeRecord << '\n';
+         std::ifstream inFile;
+         inFile.open(filename, std::ios::in | std::ios::binary);
+         inFile.seekg((sizeRecord * (4-1)) + (1 * (4-1)), std::ios::beg);
+         std::cout << "tellg: " << inFile.tellg() << '\n';
+         char codigo[5];
+         inFile.read(codigo, 5);
+         std::cout << "codigo: " << codigo << '\n';
+         if(codigo == key){
+             std::cout << "Found record\n";
+         }
+      }
 };
 
 #endif //LAB2_1_SEQUENTIALFILEREGISTRO_H

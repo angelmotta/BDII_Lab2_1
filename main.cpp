@@ -32,6 +32,9 @@ int main() {
     // Check metadata and verify (internal tool)
     myFileRegistroDb.scanFileDb();
 
-    
+    /**
+     * P2. b)
+     */
+     myFileRegistroDb.binarySearch("004");
     return 0;
 }
