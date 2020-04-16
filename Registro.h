@@ -28,8 +28,8 @@ public:
         this->nextRecord = 0;           // default 0 means -> does not exist Next element
     }
 
-    void getCodigo(){
-        std::cout << this->codigo << '\n';
+    char* getCodigo(){
+        return this->codigo;
     }
 
     void setNextRecord(int _next){

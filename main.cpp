@@ -9,18 +9,15 @@ using namespace std;
 int main() {
     Registro reg1 = Registro("001", "CS", 5);
     Registro reg2 = Registro("002", "CS", 5);
-    Registro reg3 = Registro("003", "CS", 5);
-    Registro reg4 = Registro("004", "CS", 5);
     Registro reg5 = Registro("005", "CS", 5);
     Registro reg6 = Registro("006", "CS", 5);
-
+    Registro reg7 = Registro("007", "CS", 5);
     vector<Registro> registros;     // vector desordenado
-    registros.push_back(reg3);
     registros.push_back(reg2);
     registros.push_back(reg1);
     registros.push_back(reg6);
     registros.push_back(reg5);
-    registros.push_back(reg4);
+
 
     /**
      * P1. a)
@@ -33,8 +30,26 @@ int main() {
     myFileRegistroDb.scanFileDb();
 
     /**
-     * P2. b)
+     * P1. b)
      */
-     myFileRegistroDb.binarySearch("004");
+     int res = myFileRegistroDb.binarySearch("004");
+     std::cout << "binarySearch Result: record is located in row " << res << '\n';
+     /**
+      * P1. c)
+      */
+    // Insert
+    Registro reg3 = Registro("003", "CS", 5);
+    myFileRegistroDb.add(reg3);
+    myFileRegistroDb.scanFileDb();
+
+    // Insert
+    Registro reg8 = Registro("008", "CS", 5);
+    myFileRegistroDb.add(reg8);
+    myFileRegistroDb.scanFileDb();
+
+    // Insert
+    Registro reg4 = Registro("004", "CS", 5);
+    myFileRegistroDb.add(reg4);
+    myFileRegistroDb.scanFileDb();
     return 0;
 }
