@@ -3,4 +3,4 @@ project(lab2_1)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(lab2_1 main.cpp Registro.h SequentialFileRegistro.h)
+add_executable(lab2_1 main.cpp Registro.h SequentialFileRegistro.h RandomDirectFileRegistro.h)

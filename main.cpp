@@ -17,6 +17,9 @@ int main() {
     registros.push_back(reg6);
     registros.push_back(reg5);
 
+    /**
+     * P1. Sequential File
+     */
 
     /**
      * P1. a)
@@ -30,6 +33,7 @@ int main() {
 
     /**
      * P1. b)
+     * binarySearch realiza un numero de Accesos a disco que es lg(n)
      */
      int res = myFileRegistroDb.binarySearch("004");
      std::cout << "binarySearch Result: record is located in row " << res << '\n';
@@ -55,6 +59,30 @@ int main() {
     Registro reg10 = Registro("010", "CS", 5);
     myFileRegistroDb.add(reg10);
     myFileRegistroDb.scanFileDb();
+
+    // Insert until reach 10 records
+    Registro reg11 = Registro("011", "CS", 5);
+    Registro reg12 = Registro("012", "CS", 5);
+    Registro reg13 = Registro("013", "CS", 5);
+    Registro reg14 = Registro("014", "CS", 5);
+    Registro reg15 = Registro("015", "CS", 5);
+    Registro reg16 = Registro("016", "CS", 5);
+    myFileRegistroDb.add(reg11);
+    myFileRegistroDb.add(reg12);
+    myFileRegistroDb.add(reg13);
+    myFileRegistroDb.add(reg14);
+    myFileRegistroDb.add(reg15);
+    myFileRegistroDb.scanFileDb();
+    myFileRegistroDb.add(reg16);
+    myFileRegistroDb.scanFileDb();
+
+    /**
+     * P2. Random File
+     */
+
+    /**
+     * P2. a)
+     */
 
     return 0;
 }

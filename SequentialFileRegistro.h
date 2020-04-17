@@ -111,6 +111,70 @@ private:
         return row;
     }
 
+    void setNewDataFile(std::string dataFileNew){
+        this->dataFile = dataFileNew;
+    }
+
+    void MergeFiles(){
+        std::cout << "\n** Merge Files method **\n";
+        std::fstream newDataFile;
+        std::string dataFileNew = "new_"+dataFile;
+        newDataFile.open(dataFileNew, std::ios::out | std::ios::in | std::ios::trunc | std::ios::binary);
+        newDataFile.close();
+        newDataFile.open(dataFileNew, std::ios::out | std::ios::in | std::ios::app | std::ios::binary);
+        int rowNewDataFile = 1;
+        Registro record;
+        int sizeRecord = sizeof(record);
+        std::ifstream inFile;
+        inFile.open(dataFile, std::ios::in | std::ios::binary);
+        int next;
+        while(true){
+            // Read data File
+            std::cout << "\n** Read Data File **\n";
+            while(inFile >> record) {
+                rowNewDataFile++;
+                record.showMetaData();
+                next = record.getNextRecord();
+                // Update next field of object before write to Data File
+                record.setNextRecord(rowNewDataFile);
+                newDataFile << record;  // write operation
+                if(next < 0){
+                    break;
+                }
+            }
+            inFile.close();
+            // Read Aux File
+            std::cout << "\n** Read Aux File DB **\n";
+            inFile.open(auxFile, std::ios::in | std::ios::binary);
+            inFile.seekg((sizeRecord * ((next * -1) - 1)) + (1 * ((next * -1) - 1)), std::ios::beg);
+            while(inFile >> record) {
+                rowNewDataFile++;
+                record.showMetaData();
+                next = record.getNextRecord();
+                // Update next field of object before write to Data File
+                record.setNextRecord(rowNewDataFile);
+                newDataFile << record;  // write operation
+                if(next >= 0) {
+                    break;
+                }
+            }
+            inFile.close();
+            if(next == 0){
+                break;
+            }
+            // update file pointer
+            inFile.open(dataFile, std::ios::in | std::ios::binary);
+            inFile.seekg((sizeRecord * ((next) - 1)) + (1 * ((next) - 1)), std::ios::beg);
+        }
+        inFile.close();
+        // Merge job finished
+        // Init aux file
+        std::ofstream outAuxFile;
+        outAuxFile.open(auxFile,std::ios::out | std::ios::trunc | std::ios::binary); // trunc 'discard existing content'
+        outAuxFile.close();
+        setNewDataFile(dataFileNew);
+    }
+
 public:
     // Default Constructor
     SequentialFileRegistro() = default;
@@ -202,6 +266,10 @@ public:
                 // Avanza al siguiente record considerando el Next value
                 nextRecord = next;
             }
+        }
+        // if we have more than 10 records in aux File Call Merge
+        if(rowsAuxFile == 10) {
+            MergeFiles();               // Merge method
         }
     }
 

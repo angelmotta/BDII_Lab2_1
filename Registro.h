@@ -36,6 +36,10 @@ public:
         this->nextRecord = _next;
     }
 
+    int getNextRecord() {
+        return this->nextRecord;
+    }
+
     void showMetaData(){
         std::cout << codigo << ", " << carrera << ", " << ciclo << ", " << nextRecord << '\n';
     }
