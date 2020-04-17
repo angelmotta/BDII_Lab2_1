@@ -11,7 +11,6 @@ int main() {
     Registro reg2 = Registro("002", "CS", 5);
     Registro reg5 = Registro("005", "CS", 5);
     Registro reg6 = Registro("006", "CS", 5);
-    Registro reg7 = Registro("007", "CS", 5);
     vector<Registro> registros;     // vector desordenado
     registros.push_back(reg2);
     registros.push_back(reg1);
@@ -48,8 +47,14 @@ int main() {
     myFileRegistroDb.scanFileDb();
 
     // Insert
-    Registro reg4 = Registro("004", "CS", 5);
-    myFileRegistroDb.add(reg4);
+    Registro reg9 = Registro("009", "CS", 5);
+    myFileRegistroDb.add(reg9);
     myFileRegistroDb.scanFileDb();
+
+    // Insert
+    Registro reg10 = Registro("010", "CS", 5);
+    myFileRegistroDb.add(reg10);
+    myFileRegistroDb.scanFileDb();
+
     return 0;
 }

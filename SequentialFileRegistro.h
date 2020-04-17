@@ -36,16 +36,35 @@ private:
         inFile.open(dataFile, std::ios::in | std::ios::binary);
         inFile.seekg((sizeRecord * (row)) + (1 * row), std::ios::beg);
         inFile.read(codigo, 5);
+        inFile.close();
         std::cout << "Read from disk....getCodigoFromRow: " << codigo << '\n';
     }
 
-    int getNextRecordFromRow(int row) {
+    void getCodigoFromRowAux(int row, char* codigo) {       // used by BinarySearch
         Registro record;
         int sizeRecord = sizeof(record);
         std::ifstream inFile;
-        inFile.open(dataFile, std::ios::in | std::ios::binary);
-        // Locate File pointer in that row and read nextRecord field
-        inFile.seekg((sizeRecord * (row - 1)) + (1 * (row - 1)) + (24), std::ios::beg);
+        inFile.open(auxFile, std::ios::in | std::ios::binary);
+        inFile.seekg((sizeRecord * (row - 1)) + (1 * (row - 1)), std::ios::beg);
+        inFile.read(codigo, 5);
+        inFile.close();
+        std::cout << "Read from disk....getCodigoFromRowAux: " << codigo << '\n';
+    }
+
+    int getNextRecordFromRow(int row, int typeFile) {
+        Registro record;
+        int sizeRecord = sizeof(record);
+        std::ifstream inFile;
+        if(typeFile == 1){
+            inFile.open(dataFile, std::ios::in | std::ios::binary);
+            // Locate File pointer in that row and read nextRecord field
+            inFile.seekg((sizeRecord * (row - 1)) + (1 * (row - 1)) + (24), std::ios::beg);
+        }
+        else {
+            inFile.open(auxFile, std::ios::in | std::ios::binary);
+            // Locate File pointer in that row and read nextRecord field
+            inFile.seekg((sizeRecord * (row - 1)) + (1 * (row - 1)) + (24), std::ios::beg);
+        }
         int nextRecord;
         inFile.read(reinterpret_cast<char *>(&nextRecord), sizeof(nextRecord));
         std::cout << "getNextRecord: " << nextRecord << '\n';
@@ -53,12 +72,18 @@ private:
         return nextRecord;
     }
 
-    void updateNextRecord(int row, int nextValue) {
+    void updateNextRecord(int row, int nextValue, int typeFile) {
         //std::cout << "update row: " << row << ", nextValue: " << nextValue << '\n';
         Registro record;
         int sizeRecord = sizeof(record);
         std::fstream outFile;
-        outFile.open(dataFile, std::ios::out | std::ios::in | std::ios::binary);
+        if(typeFile == 1){
+            outFile.open(dataFile, std::ios::out | std::ios::in | std::ios::binary);
+        }
+        else {
+            outFile.open(auxFile, std::ios::out | std::ios::in | std::ios::binary);
+        }
+
         if(outFile.is_open()){
             outFile.seekp((sizeRecord * (row - 1)) + (1 * (row - 1)) + (24), std::ios::beg);
             outFile.write((char *)(&nextValue), sizeof(nextValue));
@@ -130,24 +155,54 @@ public:
         // Identificar despues de que fila del data file insertar el nuevo registro
         int afterRow = getWhereToInsert(codigo);    // row = {1,2,3...}
         // Get Next value from that row
-        int nextRecord = getNextRecordFromRow(afterRow);
-        // If next value is positive check in DataFile if that row is deleted (Pending implementation)
-
-        // Update nextRecord field of new object
-        registro.setNextRecord(nextRecord);
-        // Insert new record in Aux File (using Next value previously obtained)
-        std::fstream outAuxFile;
-        outAuxFile.open(auxFile, std::ios::out | std::ios::in | std::ios::app | std::ios::binary);
-        int pos = outAuxFile.tellg();
-        //std::cout << "seek pos: " << pos << '\n';
-        int rowNumAuxFile = (pos / (sizeof(registro) + 1)) + 1;
-        rowNumAuxFile = rowNumAuxFile * -1;     // Negative Value for Data File
-        std::cout << "Row number in Aux: " << rowNumAuxFile << '\n';
-        outAuxFile << registro;                 // Write in AuxFile
-        rowsAuxFile++;
-        outAuxFile.close();
-        // Update nextRecord in DataFile
-        updateNextRecord(afterRow, rowNumAuxFile);
+        int nextRecord = getNextRecordFromRow(afterRow, 1);
+        // If next value is positive write directly in Aux File
+        if(nextRecord >= 0){
+            // Update nextRecord field of new object
+            registro.setNextRecord(nextRecord);
+            // Insert new record in Aux File (using Next value previously obtained)
+            std::fstream outAuxFile;
+            outAuxFile.open(auxFile, std::ios::out | std::ios::in | std::ios::app | std::ios::binary);
+            int pos = outAuxFile.tellg();
+            int rowNumAuxFile = (pos / (sizeof(registro) + 1)) + 1;
+            rowNumAuxFile = rowNumAuxFile * -1;     // Negative Value for Data File
+            std::cout << "Row number in Aux: " << rowNumAuxFile << '\n';
+            outAuxFile << registro;                 // Write in AuxFile
+            rowsAuxFile++;
+            outAuxFile.close();
+            // Update nextRecord in DataFile
+            updateNextRecord(afterRow, rowNumAuxFile, 1);
+        }
+        //Other case continue checking in Aux File and identify where to place inside Aux File
+        else {
+            while(true){
+                char codAux[5];
+                getCodigoFromRowAux(nextRecord * -1, codAux);        // codAux: read Codigo from file
+                int next = getNextRecordFromRow(nextRecord * - 1, 0);   // next: read Next from Aux File
+                // check where to insert in Aux File
+                if(codAux > codigo){
+                    std::cout << "Write pointing before row: " << nextRecord << '\n';
+                    break;
+                }
+                if(next == 0){
+                    std::cout << "Write pointing after row: " << nextRecord << '\n';
+                    std::fstream outAuxFile;
+                    outAuxFile.open(auxFile, std::ios::out | std::ios::in | std::ios::app | std::ios::binary);
+                    int pos = outAuxFile.tellg();
+                    int rowNumAuxFile = (pos / (sizeof(registro) + 1)) + 1;
+                    // Update NextRecord field in Aux File
+                    rowNumAuxFile = rowNumAuxFile * -1;     // Negative Value for Aux File
+                    updateNextRecord(nextRecord * -1, rowNumAuxFile, 0);
+                    // Write record in AuxFile
+                    outAuxFile << registro;
+                    rowsAuxFile++;
+                    outAuxFile.close();
+                    break;
+                }
+                // Avanza al siguiente record considerando el Next value
+                nextRecord = next;
+            }
+        }
     }
 
 
