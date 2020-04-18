@@ -16,12 +16,11 @@ private:
     std::string indexFile;
     std::string dataFile;
 
-    void updateIndexFile(Registro& registro, int row){
+    void updateIndexFile(char* codigoRegistro, int row){
         std::fstream outIndexFile;
         outIndexFile.open(indexFile, std::ios::out |std::ios::app | std::ios::binary);
         if(outIndexFile.is_open()){
-            std::cout << "Write Index\n";
-            outIndexFile.write(registro.getCodigo(),  5);       // Write Key
+            outIndexFile.write(codigoRegistro,  5);       // Write Key
             outIndexFile.write((char *)(&row), sizeof(row));    // Write Row number
             outIndexFile << "\n";
             outIndexFile << std::flush;
@@ -69,7 +68,7 @@ public:
             // Write object to Data file
             outFile << registro;
             // Update index File
-            updateIndexFile(registro, row);
+            updateIndexFile(registro.getCodigo(), row);
             row++;
         }
         outFile.close();
@@ -151,7 +150,7 @@ public:
         inFile.close();
     }
 
-    void add(Registro registro) {
+    void add(Registro registro, std::map<std::string, int>& indexMap) {
         std::cout << "\n*** Add method ***\n";
         std::fstream outFile;
         outFile.open(dataFile, std::ios::out |std::ios::app | std::ios::binary);
@@ -160,8 +159,11 @@ public:
         int sizeRecord = sizeof(registro) + 1;
         int rowNewRecord = (pos / sizeRecord) + 1;
         outFile << registro;
-        // Update Index (Map and File Index)
-        updateIndexFile(registro, rowNewRecord);
+        // Update Map (Memory)
+        std::string codigo = registro.getCodigo();
+        indexMap.insert({codigo, rowNewRecord});
+        // Update Index (Disk)
+        updateIndexFile(registro.getCodigo(), rowNewRecord);
     }
 };
 
