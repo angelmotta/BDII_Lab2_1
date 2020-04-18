@@ -103,5 +103,11 @@ int main() {
     // Busqueda usando key-record in index Map
     myRandomFileDb.search(indexMap, "006");     // search codigo '005'
     myRandomFileDb.search(indexMap, "008");     // search codigo '005'
+
+    // P2. c)
+    // Agregar nuevo registro
+    Registro reg20 = Registro("020", "CS", 4);
+    myRandomFileDb.add(reg20);
+    myRandomFileDb.scanFileDb();
     return 0;
 }

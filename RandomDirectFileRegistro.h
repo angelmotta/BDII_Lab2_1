@@ -21,8 +21,8 @@ private:
         outIndexFile.open(indexFile, std::ios::out |std::ios::app | std::ios::binary);
         if(outIndexFile.is_open()){
             std::cout << "Write Index\n";
-            outIndexFile.write(registro.getCodigo(),  5);
-            outIndexFile.write((char *)(&row), sizeof(row));
+            outIndexFile.write(registro.getCodigo(),  5);       // Write Key
+            outIndexFile.write((char *)(&row), sizeof(row));    // Write Row number
             outIndexFile << "\n";
             outIndexFile << std::flush;
         }
@@ -149,6 +149,19 @@ public:
             inFile.get();   // read endLine character
         }
         inFile.close();
+    }
+
+    void add(Registro registro) {
+        std::cout << "\n*** Add method ***\n";
+        std::fstream outFile;
+        outFile.open(dataFile, std::ios::out |std::ios::app | std::ios::binary);
+        // Get row number
+        int pos = outFile.tellg();
+        int sizeRecord = sizeof(registro) + 1;
+        int rowNewRecord = (pos / sizeRecord) + 1;
+        outFile << registro;
+        // Update Index (Map and File Index)
+        updateIndexFile(registro, rowNewRecord);
     }
 };
 
