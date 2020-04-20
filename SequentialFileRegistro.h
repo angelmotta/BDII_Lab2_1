@@ -37,7 +37,7 @@ private:
         inFile.seekg((sizeRecord * (row)) + (1 * row), std::ios::beg);
         inFile.read(codigo, 5);
         inFile.close();
-        std::cout << "Read from disk....getCodigoFromRow: " << codigo << '\n';
+        //std::cout << "Read from disk....getCodigoFromRow: " << codigo << '\n';
     }
 
     void getCodigoFromRowAux(int row, char* codigo) {       // used by BinarySearch
@@ -48,7 +48,7 @@ private:
         inFile.seekg((sizeRecord * (row - 1)) + (1 * (row - 1)), std::ios::beg);
         inFile.read(codigo, 5);
         inFile.close();
-        std::cout << "Read from disk....getCodigoFromRowAux: " << codigo << '\n';
+        //std::cout << "Read from disk....getCodigoFromRowAux: " << codigo << '\n';
     }
 
     int getNextRecordFromRow(int row, int typeFile) {
@@ -67,7 +67,7 @@ private:
         }
         int nextRecord;
         inFile.read(reinterpret_cast<char *>(&nextRecord), sizeof(nextRecord));
-        std::cout << "getNextRecord: " << nextRecord << '\n';
+        //std::cout << "getNextRecord: " << nextRecord << '\n';
         inFile.close();
         return nextRecord;
     }
@@ -101,13 +101,13 @@ private:
             row++;
             codigoFromFile = record.getCodigo();
             if(codigoFromFile > codigo) {
-                std::cout << "codigoFromFile '" << codigoFromFile << "' > " << codigo << '\n';
+                //std::cout << "codigoFromFile '" << codigoFromFile << "' > " << codigo << '\n';
                 row--;
                 break;
             }
         }
         inFile.close();
-        std::cout << "Insert after row: " << row << '\n';
+        //std::cout << "Insert after row: " << row << '\n';
         return row;
     }
 
@@ -130,7 +130,7 @@ private:
         int next;
         while(true){
             // Read data File
-            std::cout << "\n** Read Data File **\n";
+            std::cout << "\n** Reading from Data File **\n";
             while(inFile >> record) {
                 rowNewDataFile++;
                 record.showMetaData();
@@ -144,7 +144,7 @@ private:
             }
             inFile.close();
             // Read Aux File
-            std::cout << "\n** Read Aux File DB **\n";
+            std::cout << "\n** Reading from Aux File DB **\n";
             inFile.open(auxFile, std::ios::in | std::ios::binary);
             inFile.seekg((sizeRecord * ((next * -1) - 1)) + (1 * ((next * -1) - 1)), std::ios::beg);
             while(inFile >> record) {
@@ -173,6 +173,7 @@ private:
         outAuxFile.open(auxFile,std::ios::out | std::ios::trunc | std::ios::binary); // trunc 'discard existing content'
         outAuxFile.close();
         setNewDataFile(dataFileNew);
+        std::cout << "\n** Merge finished **\n";
     }
 
 public:
@@ -230,7 +231,7 @@ public:
             int pos = outAuxFile.tellg();
             int rowNumAuxFile = (pos / (sizeof(registro) + 1)) + 1;
             rowNumAuxFile = rowNumAuxFile * -1;     // Negative Value for Data File
-            std::cout << "Row number in Aux: " << rowNumAuxFile << '\n';
+            //std::cout << "Row number in Aux: " << rowNumAuxFile << '\n';
             outAuxFile << registro;                 // Write in AuxFile
             rowsAuxFile++;
             outAuxFile.close();
@@ -245,11 +246,11 @@ public:
                 int next = getNextRecordFromRow(nextRecord * - 1, 0);   // next: read Next from Aux File
                 // check where to insert in Aux File
                 if(codAux > codigo){
-                    std::cout << "Write pointing before row: " << nextRecord << '\n';
+                    //std::cout << "Write pointing before row: " << nextRecord << '\n';
                     break;
                 }
                 if(next == 0){
-                    std::cout << "Write pointing after row: " << nextRecord << '\n';
+                    //std::cout << "Write pointing after row: " << nextRecord << '\n';
                     std::fstream outAuxFile;
                     outAuxFile.open(auxFile, std::ios::out | std::ios::in | std::ios::app | std::ios::binary);
                     int pos = outAuxFile.tellg();

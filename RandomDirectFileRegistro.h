@@ -38,7 +38,7 @@ private:
     }
 
     void readRecord(int row){
-        std::cout << "- Read record from data File (disk) -\n";
+        std::cout << "- Read record from data File (disk) in row number: " << row << "\n";
         Registro record;
         int sizeRecord = sizeof(record) + 1;
         std::ifstream inFile;
@@ -78,7 +78,7 @@ public:
      * Load to Memory Random File
      */
     std::map<std::string, int> loadIndexFile(){
-        std::cout << "\n** Load Index File Method **\n";
+        std::cout << "\n** Load to Memory Index File - Method **\n";
         std::map<std::string, int> indexMap;
         std::ifstream inFile;
         inFile.open(indexFile, std::ios::in | std::ios::binary);
@@ -108,7 +108,7 @@ public:
         std::cout << "search key '" << key << "' in map (Memory)\n";
         auto itrResult = indexMap.find(key);
         if(itrResult != indexMap.end()){
-            std::cout << "Found row value: " << itrResult->second << "\n";
+            std::cout << "Key Found! row value is: " << itrResult->second << "\n";
             readRecord(itrResult->second);
         }
         else{
@@ -152,6 +152,7 @@ public:
 
     void add(Registro registro, std::map<std::string, int>& indexMap) {
         std::cout << "\n*** Add method ***\n";
+        std::cout << "add registro codigo: " << registro.getCodigo() << '\n';
         std::fstream outFile;
         outFile.open(dataFile, std::ios::out |std::ios::app | std::ios::binary);
         // Get row number
