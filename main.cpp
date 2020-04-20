@@ -29,7 +29,7 @@ int main() {
      * InsertAll(vector<Registro> registros)
      */
     std::cout << "\n--- P1. a) ---\n";
-    SequentialFileRegistro myFileRegistroDb("registros.txt");
+    SequentialFileRegistro myFileRegistroDb("registros.dat");
     // Insert all records to data File
     myFileRegistroDb.insertAll(registros);
     // Check metadata and verify (internal tool)
