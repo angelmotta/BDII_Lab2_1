@@ -107,7 +107,7 @@ int main() {
     // P2. c)
     // Agregar nuevo registro
     Registro reg20 = Registro("020", "CS", 4);
-    myRandomFileDb.add(reg20, indexMap);
+    myRandomFileDb.add(reg20, indexMap);    // Update map and index file in disk
     myRandomFileDb.scanFileDb();
 
     myRandomFileDb.search(indexMap, "020");
